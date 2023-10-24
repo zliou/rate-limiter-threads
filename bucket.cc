@@ -12,6 +12,8 @@ void TakeToken(std::string thread_name, std::stack<int>* tokens, int rate_ms) {
       int token = tokens->top();
       tokens->pop();
       std::cout << "  Thread " << thread_name << " took token #" << token << std::endl;
+    } else {
+      std::cout << "  --  Thread " << thread_name << " could not take a token." << std::endl;
     }
     
     // Attempt to take a new token every `rate_ms` milliseconds.
@@ -25,6 +27,8 @@ void PlaceToken(std::stack<int>* tokens, int rate_ms, size_t max_tokens = 5) {
       int token_number = tokens->size();
       tokens->push(token_number);
       std::cout << "Placed token #" << token_number << std::endl;
+    } else {
+      std::cout << "No tokens were placed because the bucket is full." << std::endl;
     }
 
     // Attempt to place a new token every `rate_ms` milliseconds.
@@ -35,11 +39,11 @@ void PlaceToken(std::stack<int>* tokens, int rate_ms, size_t max_tokens = 5) {
 void RunExperiment() {
   std::deque<int> init = {0,1,2,3,4,5};
   std::stack<int> bucket(init);  // Start with a full bucket of tokens.
-  std::thread refiller(PlaceToken, &bucket, /*rate_ms=*/100, /*max_tokens*/5);
+  std::thread refiller(PlaceToken, &bucket, /*rate_ms=*/180, /*max_tokens*/5);
   std::thread consumer1(TakeToken, "A", &bucket, /*rate_ms=*/225);
-  std::thread consumer2(TakeToken, "B", &bucket, /*rate_ms=*/300);
-  std::thread consumer3(TakeToken, "C", &bucket, /*rate_ms=*/420);
-  std::thread consumer4(TakeToken, "D", &bucket, /*rate_ms=*/333);
+  std::thread consumer2(TakeToken, "B", &bucket, /*rate_ms=*/800);
+  std::thread consumer3(TakeToken, "C", &bucket, /*rate_ms=*/770);
+  std::thread consumer4(TakeToken, "D", &bucket, /*rate_ms=*/999);
 
   consumer1.join();
   consumer2.join();
